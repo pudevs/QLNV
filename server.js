@@ -67,6 +67,25 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
+// API xoá toàn bộ dữ liệu và reset IDENTITY
+app.delete('/api/reset-all', async (req, res) => {
+  try {
+    await sql.connect(config);
+    // Xoá dữ liệu bảng con trước (luong, nhanvien), sau đó bảng cha (phongban)
+    await sql.query`DELETE FROM luong`;
+    await sql.query`DELETE FROM nhanvien`;
+    await sql.query`DELETE FROM phongban`;
+    // Reset lại IDENTITY về 0
+    await sql.query`DBCC CHECKIDENT ('luong', RESEED, 0)`;
+    await sql.query`DBCC CHECKIDENT ('nhanvien', RESEED, 0)`;
+    await sql.query`DBCC CHECKIDENT ('phongban', RESEED, 0)`;
+    res.json({ message: 'Đã xoá toàn bộ dữ liệu và reset IDENTITY!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Lỗi khi reset dữ liệu.', error: err.message });
+  }
+});
+
 // Lấy danh sách nhân viên
 app.get('/api/employees', async (req, res) => {
   try {
@@ -152,7 +171,10 @@ app.delete('/api/employees/:id', async (req, res) => {
 app.get('/api/departments', async (req, res) => {
   try {
     await sql.connect(config);
-    const result = await sql.query`SELECT * FROM phongban`;
+    // Chỉ định rõ tên trường, không dùng SELECT *
+    const result = await sql.query`
+      SELECT phongbanId AS phongbanId, tenPb, motaPb FROM phongban
+    `;
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
@@ -160,7 +182,8 @@ app.get('/api/departments', async (req, res) => {
   }
 });
 
-// Thêm phòng ban
+
+// Thêm phòng ban 
 app.post('/api/departments', async (req, res) => {
   const { tenPb, motaPb } = req.body;
   if (!tenPb) {
@@ -215,6 +238,72 @@ app.delete('/api/departments/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Lỗi khi xoá phòng ban.', error: err.message });
+  }
+});
+
+// ===== CHỨC VỤ: HIỂN THỊ, THÊM, SỬA, XOÁ =====
+// Lấy danh sách chức vụ
+app.get('/api/positions', async (req, res) => {
+  try {
+    await sql.connect(config);
+    const result = await sql.query`SELECT chucvuId, tenCV, motaCV FROM chucvu`;
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi lấy chức vụ.' });
+  }
+});
+
+// Thêm chức vụ
+app.post('/api/positions', async (req, res) => {
+  const { tenCV, motaCV } = req.body;
+  if (!tenCV) {
+    return res.status(400).json({ message: 'Thiếu tên chức vụ!' });
+  }
+  try {
+    await sql.connect(config);
+    await sql.query`
+      INSERT INTO chucvu (tenCV, motaCV)
+      VALUES (${tenCV}, ${motaCV})
+    `;
+    res.status(201).json({ message: 'Thêm chức vụ thành công!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi thêm chức vụ.', error: err.message });
+  }
+});
+
+// Sửa chức vụ
+app.put('/api/positions/:id', async (req, res) => {
+  const { id } = req.params;
+  const { tenCV, motaCV } = req.body;
+  if (!tenCV) {
+    return res.status(400).json({ message: 'Thiếu tên chức vụ!' });
+  }
+  try {
+    await sql.connect(config);
+    await sql.query`
+      UPDATE chucvu
+      SET tenCV = ${tenCV}, motaCV = ${motaCV}
+      WHERE chucvuId = ${id}
+    `;
+    res.json({ message: 'Cập nhật chức vụ thành công!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi cập nhật chức vụ.', error: err.message });
+  }
+});
+
+// Xoá chức vụ
+app.delete('/api/positions/:id', async (req, res) => {
+  let id = req.params.id;
+  id = Number(id);
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ message: 'ID chức vụ không hợp lệ!' });
+  }
+  try {
+    await sql.connect(config);
+    await sql.query`DELETE FROM chucvu WHERE chucvuId = ${id}`;
+    res.json({ message: 'Xoá chức vụ thành công!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi xoá chức vụ.', error: err.message });
   }
 });
 

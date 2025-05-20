@@ -8,7 +8,7 @@
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link rel="stylesheet" href="build/tailwind.css">
   <link rel="stylesheet" href="2-index.css">
-  <title>Danh sách | PuBaDa</title>
+  <title>Chức vụ | PuBaDa</title>
 </head>
 
 <body>
@@ -54,7 +54,6 @@
   </div>
 
   <div class="main">
-    <!-- ...search, logo -->
     <div class="header">
       <div class="search">
         <input type="text" id="searchInput" placeholder="Tìm kiếm chức vụ...">
@@ -63,8 +62,41 @@
       <img src="assets/profile.png">
     </div>
 
-    <!-- Chức vụ Section -->
-    
+    <!-- Section chức vụ -->
+    <div class="content" id="positions-section">
+      <div class="section-header">
+        <h3>Danh sách chức vụ</h3>
+        <button id="addPositionBtn" class="add-btn">+ Thêm chức vụ</button>
+      </div>
+      <table id="positionTable" class="table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên chức vụ</th>
+            <th>Mô tả</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="positionList">
+          <!-- Dữ liệu sẽ được load bằng JS -->
+        </tbody>
+      </table>
+      <div id="addPositionForm" style="display:none; margin-top:24px;">
+        <h3>Thêm/Sửa chức vụ</h3>
+        <form id="positionForm">
+          <div>
+            <label>Tên chức vụ:</label>
+            <input type="text" id="tenCV" name="tenCV" required>
+          </div>
+          <div>
+            <label>Mô tả:</label>
+            <input type="text" id="motaCV" name="motaCV">
+          </div>
+          <button type="submit" class="add-btn">Lưu</button>
+          <button type="button" id="cancelPosition" class="add-btn" style="background:#e74c3c;color:#fff;">Huỷ</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script src="index.js"></script>
