@@ -1,0 +1,344 @@
+// ===== ĐĂNG NHẬP/ĐĂNG KÝ =====
+const container = document.getElementById('container');
+const registerBtn = document.getElementById('register');
+const loginBtn = document.getElementById('login');
+const loginForm = document.getElementById('loginForm');
+const signUpForm = document.querySelector('.sign-up form');
+
+if (registerBtn && container) {
+    registerBtn.onclick = () => container.classList.add("active");
+}
+if (loginBtn && container) {
+    loginBtn.onclick = () => container.classList.remove("active");
+}
+if (loginForm) {
+    loginForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+            const data = await res.json();
+            if (!res.ok) return alert(data.message || 'Đăng nhập thất bại!');
+            alert(data.message);
+            window.location.href = data.user.role === 'admin' ? '/1-danhsach.html' : '/portfolio.html';
+        } catch (error) {
+            alert('Đã xảy ra lỗi khi đăng nhập.');
+        }
+    };
+}
+if (signUpForm) {
+    signUpForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('signup-username').value;
+        const password = document.getElementById('signup-password').value;
+        try {
+            const res = await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+            const data = await res.json();
+            if (!res.ok) return alert(data.message || 'Đăng ký thất bại!');
+            alert(data.message);
+        } catch (error) {
+            alert('Đã xảy ra lỗi khi đăng ký.');
+        }
+    };
+}
+
+// ===== HÀM CHUNG =====
+const isValidId = id => id && id !== 'undefined' && !isNaN(Number(id));
+function showForm(table, form, edit = false, data = {}, idField = 'data-edit-id') {
+    if (!table || !form) return;
+    table.style.display = edit ? 'none' : '';
+    form.style.display = edit ? 'block' : 'none';
+    form.reset();
+    if (edit && data && data.id !== undefined) {
+        form.setAttribute(idField, data.id);
+        Object.keys(data).forEach(k => {
+            if (form[k] !== undefined) form[k].value = data[k] || '';
+        });
+    } else {
+        form.removeAttribute(idField);
+    }
+}
+
+// ===== SIDEBAR & MENU =====
+const sidebarItems = document.querySelectorAll('.sidebar .item');
+sidebarItems.forEach(item => {
+    item.addEventListener('click', function () {
+        sidebarItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        const sectionId = this.getAttribute('data-section');
+        if (sectionId) {
+            document.querySelectorAll('.main .content').forEach(sec => sec.style.display = 'none');
+            const section = document.getElementById(sectionId + '-section');
+            if (section) section.style.display = 'block';
+        }
+    });
+});
+const menuToggle = document.getElementById('menuToggle');
+const leftSection = document.getElementById('leftSection');
+if (menuToggle && leftSection) {
+    menuToggle.onclick = function () {
+        leftSection.classList.toggle('collapsed');
+    };
+}
+
+// ===== ĐĂNG XUẤT =====
+const logoutBtn = document.getElementById('logout');
+if (logoutBtn) {
+    logoutBtn.onclick = function () {
+        window.location.href = 'login.html';
+    };
+}
+
+// ===== DASHBOARD: DANH SÁCH NHÂN VIÊN (CHỈ XEM) =====
+async function loadDashboardEmployees() {
+    const tbody = document.getElementById('dashboardEmployeeList');
+    if (!tbody) return;
+    try {
+        const res = await fetch('/api/employees');
+        if (!res.ok) return;
+        const data = await res.json();
+        tbody.innerHTML = data.map((nv, idx) => `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${nv.tenNV}</td>
+              <td>${nv.emailNV}</td>
+              <td>${nv.sdtNV}</td>
+              <td>${nv.diachiNV}</td>
+              <td>${nv.tenPb || ''}</td>
+              <td>${nv.tenCV || ''}</td>
+              <td>${nv.trangthaiNV ? 'Đang làm' : 'Nghỉ'}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error(e);
+    }
+}
+loadDashboardEmployees();
+
+// ===== NHÂN VIÊN: HIỂN THỊ, THÊM, SỬA, XOÁ =====
+const addBtn = document.getElementById('addEmployeeBtn');
+const cancelBtn = document.getElementById('cancelAdd');
+const employeeTable = document.getElementById('employeeTable');
+const addEmployeeForm = document.getElementById('addEmployeeForm');
+const employeeForm = document.getElementById('employeeForm');
+
+async function loadEmployees() {
+    const tbody = document.getElementById('employeeList');
+    if (!tbody) return;
+    try {
+        const res = await fetch('/api/employees');
+        if (!res.ok) return;
+        const data = await res.json();
+        tbody.innerHTML = data.map((nv, idx) => `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${nv.tenNV}</td>
+              <td>${nv.emailNV}</td>
+              <td>${nv.sdtNV}</td>
+              <td>${nv.diachiNV}</td>
+              <td>${nv.tenPb || ''}</td>
+              <td>${nv.tenCV || ''}</td>
+              <td>${nv.trangthaiNV ? 'Đang làm' : 'Nghỉ'}</td>
+              <td>
+                <button class="action-btn edit" data-id="${nv.nhanvienId}">Sửa</button>
+                <button class="action-btn delete" data-id="${nv.nhanvienId}">Xoá</button>
+              </td>
+            </tr>
+        `).join('');
+        const total = document.getElementById('totalEmployees');
+        if (total) total.textContent = data.length;
+
+        // Sửa nhân viên
+        tbody.querySelectorAll('.edit').forEach(btn => {
+            btn.onclick = function () {
+                const id = this.getAttribute('data-id');
+                const nv = data.find(n => String(n.nhanvienId) === String(id));
+                if (!nv) return;
+                showForm(employeeTable, addEmployeeForm, true, {
+                    id,
+                    tenNV: nv.tenNV,
+                    emailNV: nv.emailNV,
+                    sdtNV: nv.sdtNV,
+                    diachiNV: nv.diachiNV,
+                    phongbanId: nv.phongbanId,
+                    chucvuId: nv.chucvuId,
+                    trangthaiNV: nv.trangthaiNV ? '1' : '0'
+                });
+                employeeForm.setAttribute('data-edit-id', id);
+            };
+        });
+
+        // Xoá nhân viên
+        tbody.querySelectorAll('.delete').forEach(btn => {
+            btn.onclick = async function () {
+                const id = this.getAttribute('data-id');
+                if (!isValidId(id)) return;
+                if (confirm('Bạn có chắc muốn xoá nhân viên này?')) {
+                    const res = await fetch('/api/employees/' + id, { method: 'DELETE' });
+                    const result = await res.json();
+                    if (res.ok) {
+                        alert('Xoá thành công!');
+                        loadEmployees();
+                    } else {
+                        alert(result.message || 'Có lỗi xảy ra khi xoá!');
+                    }
+                }
+            };
+        });
+    } catch (e) {
+        console.error(e);
+    }
+}
+loadEmployees();
+
+if (addBtn) addBtn.onclick = () => showForm(employeeTable, addEmployeeForm, true);
+if (cancelBtn) cancelBtn.onclick = () => showForm(employeeTable, addEmployeeForm, false);
+
+if (employeeForm) {
+    employeeForm.onsubmit = async function (e) {
+        e.preventDefault();
+        const tenNV = employeeForm.tenNV.value;
+        const emailNV = employeeForm.emailNV.value;
+        const sdtNV = employeeForm.sdtNV.value;
+        const diachiNV = employeeForm.diachiNV.value;
+        const phongbanId = employeeForm.phongbanId.value;
+        const chucvuId = employeeForm.chucvuId.value;
+        const trangthaiNV = employeeForm.trangthaiNV.value;
+        const editId = employeeForm.getAttribute('data-edit-id');
+        let url = '/api/employees';
+        let method = 'POST';
+        let body = { tenNV, emailNV, sdtNV, diachiNV, phongbanId, chucvuId, trangthaiNV };
+        if (isValidId(editId)) {
+            url += '/' + editId;
+            method = 'PUT';
+        }
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const result = await res.json();
+        if (res.ok) {
+            alert(editId ? 'Cập nhật thành công!' : 'Thêm nhân viên thành công!');
+            showForm(employeeTable, addEmployeeForm, false);
+            loadEmployees();
+        } else {
+            alert(result.message || 'Có lỗi xảy ra!');
+        }
+    };
+}
+
+// ===== PHÒNG BAN: HIỂN THỊ, THÊM, SỬA, XOÁ =====
+const departmentTable = document.getElementById('departmentTable');
+const departmentList = document.getElementById('departmentList');
+const addDepartmentBtn = document.getElementById('addDepartmentBtn');
+const addDepartmentForm = document.getElementById('addDepartmentForm');
+const departmentForm = document.getElementById('departmentForm');
+const cancelDepartment = document.getElementById('cancelDepartment');
+
+function showDepartmentForm(edit = false, pb = {}) {
+    showForm(departmentTable, addDepartmentForm, edit, {
+        id: pb.phongbanId,
+        tenPb: pb.tenPb,
+        motaPb: pb.motaPb
+    });
+    if (edit && pb.phongbanId !== undefined) {
+        departmentForm.setAttribute('data-edit-id', pb.phongbanId);
+    } else {
+        departmentForm.removeAttribute('data-edit-id');
+    }
+}
+
+async function loadDepartments() {
+    if (!departmentList) return;
+    try {
+        const res = await fetch('/api/departments');
+        if (!res.ok) return;
+        const data = await res.json();
+        departmentList.innerHTML = data.map((pb, idx) => `
+            <tr>
+                <td>${idx + 1}</td>
+                <td>${pb.tenPb}</td>
+                <td>${pb.motaPb || ''}</td>
+                <td>
+                  <button class="action-btn edit" data-id="${pb.phongbanId ?? ''}">Sửa</button>
+                  <button class="action-btn delete" data-id="${pb.phongbanId ?? ''}">Xoá</button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Sửa phòng ban
+        departmentList.querySelectorAll('.edit').forEach(btn => {
+            btn.onclick = function () {
+                const id = this.getAttribute('data-id');
+                if (!isValidId(id)) return alert('Không tìm thấy ID phòng ban!');
+                const pb = data.find(p => String(pb.phongbanId) === String(id));
+                if (!pb) return alert('Không tìm thấy phòng ban!');
+                showDepartmentForm(true, pb);
+            };
+        });
+
+        // Xoá phòng ban
+        departmentList.querySelectorAll('.delete').forEach(btn => {
+            btn.onclick = async function () {
+                const id = this.getAttribute('data-id');
+                if (!isValidId(id)) return alert('Không tìm thấy ID phòng ban!');
+                if (confirm('Bạn có chắc muốn xoá phòng ban này?')) {
+                    const res = await fetch('/api/departments/' + id, { method: 'DELETE' });
+                    const result = await res.json();
+                    if (res.ok) {
+                        alert('Xoá thành công!');
+                        loadDepartments();
+                    } else {
+                        alert(result.message || 'Có lỗi xảy ra khi xoá!');
+                    }
+                }
+            };
+        });
+    } catch (e) {
+        console.error(e);
+    }
+}
+loadDepartments();
+
+if (addDepartmentBtn) addDepartmentBtn.onclick = () => showDepartmentForm(true);
+if (cancelDepartment) cancelDepartment.onclick = () => showDepartmentForm(false);
+
+if (departmentForm) {
+    departmentForm.onsubmit = async function (e) {
+        e.preventDefault();
+        const tenPb = departmentForm.tenPb.value;
+        const motaPb = departmentForm.motaPb.value;
+        const editId = departmentForm.getAttribute('data-edit-id');
+        let url = '/api/departments';
+        let method = 'POST';
+        let body = { tenPb, motaPb };
+        if (isValidId(editId)) {
+            url += '/' + editId;
+            method = 'PUT';
+        }
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const result = await res.json();
+        // Sau khi thêm/sửa phòng ban thành công
+        if (res.ok) {
+            alert('Thêm phòng ban thành công!');
+            showDepartmentForm(false);
+            loadDepartments(); // <-- dòng này sẽ tự động load lại bảng
+        } else {
+            alert(result.message || 'Có lỗi xảy ra!');
+        }
+    };
+}

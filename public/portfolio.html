@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>Portfolio | PuDevs</title>
+
+    <style>
+        /* Lightbox modal styles */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            z-index: 51;
+        }
+    </style>
+</head>
+
+<body class="bg-zinc-950 text-white">
+
+    <div class="md:grid md:grid-cols-12 md:grid-flow-dense md:h-full xl:container xl:mx-auto 2xl:max-w-[1280px]">
+
+        <!-- Navigation -->
+        <nav data-aos="fade-down"
+            class="flex items-center justify-between bg-zinc-900 text-white m-6 p-4 rounded-2xl shadow-xl md:mb-6 md:col-span-12">
+            <a href="#"
+                class="text-gray-300 text-2xl font-semibold transition-all duration-300 hover:text-sky-500">Pu<span
+                    class="font-extrabold text-sky-500">Devs</span></a>
+
+            <div class="hidden md:flex items-center gap-x-6">
+                <ul class="hidden md:flex gap-x-6">
+                    <li><a href="#home" class="text-gray-300 hover:text-sky-500 transition-all duration-300">Home</a>
+                    </li>
+                    <li><a href="#services"
+                            class="text-gray-300 hover:text-sky-500 transition-all duration-300">Services</a></li>
+                    <li><a href="#skills"
+                            class="text-gray-300 hover:text-sky-500 transition-all duration-300">Skills</a></li>
+                    <li><a href="#about" class="text-gray-300 hover:text-sky-500 transition-all duration-300">About</a>
+                    </li>
+                    <li><a href="#portfolio"
+                            class="text-gray-300 hover:text-sky-500 transition-all duration-300">Portfolio</a></li>
+                    <li><a href="#contact"
+                            class="text-gray-300 hover:text-sky-500 transition-all duration-300">Contact</a></li>
+                    <li><a href="#out" id="logout"
+                            class="text-gray-300 hover:text-sky-500 transition-all duration-300">logout</a></li>
+                </ul>
+            </div>
+
+            <div class="text-xl md:hidden">
+                <i class='bx bx-menu cursor-pointer'></i>
+            </div>
+        </nav>
+
+        <!-- Profile Section -->
+        <div data-aos="zoom-in" class="p-6 mb-2 md:p-0 md:pl-6 md:col-span-4 lg:col-span-3">
+            <img class="w-full h-full object-cover rounded-3xl shadow-2xl hover:scale-105 transition-all duration-500 ease-in-out"
+                src="assets/profile.png" alt="Profile" onclick="openLightbox(this)">
+        </div>
+
+        <!-- Info Section -->
+        <div data-aos="fade-up"
+            class="flex flex-col gap-y-8 px-6 mb-8 md:col-span-5 md:justify-between md:mb-0 lg:col-span-3">
+            <div class="flex gap-x-4 text-white md:flex-col md:gap-y-6">
+                <div
+                    class="flex items-center justify-between bg-zinc-900 p-3.5 flex-1 rounded-2xl hover:shadow-xl transition-all duration-300">
+                    <p class="text-sm text-gray-300">Name</p>
+                    <p class="text-lg font-semibold">PuDevs</p>
+                </div>
+
+                <div
+                    class="flex items-center justify-between bg-zinc-900 p-3.5 flex-1 rounded-2xl hover:shadow-xl transition-all duration-300">
+                    <p class="text-sm text-gray-300">Based in</p>
+                    <p class="text-lg font-semibold">VietNam</p>
+                </div>
+
+                <div
+                    class="flex items-center justify-between bg-zinc-900 p-3.5 flex-1 rounded-2xl hover:shadow-xl transition-all duration-300">
+                    <p class="text-sm text-gray-300">Phone</p>
+                    <p class="text-lg font-semibold">0848488117</p>
+                </div>
+
+                <div
+                    class="flex items-center justify-between bg-zinc-900 p-3.5 flex-1 rounded-2xl hover:shadow-xl transition-all duration-300">
+                    <p class="text-sm text-gray-300">Email</p>
+                    <p class="text-lg font-semibold">vanthanh3045</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-around text-4xl text-white bg-zinc-900 p-2 rounded-2xl">
+                <a href="#"
+                    class='bx bxl-instagram cursor-pointer hover:text-[#E4405F] transition-all duration-300'></a>
+                <a href="https://www.linkedin.com/in/v%C5%A9-v%C4%83n-th%C3%A0nh-162754365/"
+                    class='bx bxl-linkedin cursor-pointer hover:text-[#405ee4] transition-all duration-300'></a>
+                <a href="https://steamcommunity.com/profiles/76561199237016089/"
+                    class='bx bxl-steam cursor-pointer hover:text-[#406ce4] transition-all duration-300'></a>
+                <a href="https://github.com/pudevs"
+                    class='bx bxl-github cursor-pointer hover:text-[#333] transition-all duration-300'></a>
+                <a href="https://www.facebook.com/vanthanh.vu.31945243"
+                    class='bx bxl-facebook cursor-pointer hover:text-[#405ee4] transition-all duration-300'></a>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div data-aos="flip-left"
+            class="flex flex-col gap-y-4 bg-zinc-900 mx-6 p-3.5 rounded-2xl mt-6 mb-8 md:col-span-12 md:flex-row md:gap-x-8 md:justify-between md:items-center lg:col-span-6 lg:flex-col lg:items-stretch">
+            <p class="text-white text-xl font-bold text-center leading-10 lg:text-3xl">Bringing Your Ideas To Life
+                Through Frontend Design</p>
+            <button
+                class="bg-sky-600 p-2 text-white font-semibold rounded-xl hover:bg-sky-500 transition-all duration-300 transform hover:scale-105">Hire
+                Now</button>
+        </div>
+
+        <!-- Stats Section -->
+        <div data-aos="fade-right"
+            class="m-6 mb-8 flex gap-2 md:col-span-3 md:flex-col md:gap-4 md:pr-6 md:m-0 lg:col-span-6 lg:flex-row lg:gap-x-4 lg:ml-0 lg:p-8">
+            <div
+                class="flex flex-col justify-center items-center flex-1 p-4 text-center bg-emerald-500 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <span class="text-4xl font-bold mb-2">2+</span>
+                <span class="text-sm">Years Experience</span>
+            </div>
+            <div
+                class="flex flex-col justify-center items-center flex-1 p-4 text-center bg-amber-500 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <span class="text-4xl font-bold mb-2">2+</span>
+                <span class="text-sm">Projects</span>
+            </div>
+            <div
+                class="flex flex-col justify-center items-center flex-1 p-4 text-center bg-red-500 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <span class="text-4xl font-bold mb-2">+</span>
+                <span class="text-sm">Clients</span>
+            </div>
+        </div>
+
+        <!-- Portfolio Section -->
+        <div data-aos="fade-up"
+            class="flex flex-col gap-y-6 mx-6 mb-8 bg-zinc-900 p-3.5 rounded-2xl md:col-span-12 lg:col-span-6 lg:col-start-7 lg:row-start-2 lg:mb-0">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-white">My Portfolio</h3>
+                <a href="#" class="text-xl text-gray-300 hover:text-white transition-all duration-300">See All</a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-4 lg:h-full">
+                <!-- Portfolio Item Template -->
+                <div
+                    class="group relative lg:h-full overflow-hidden rounded-2xl shadow-xl hover:scale-105 transition-all duration-500">
+                    <img class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-40"
+                        src="assets/1.png" alt="Portfolio image">
+                    <a href="https://github.com/pudevs/WEB1043_Assignment"
+                        class="absolute inset-0 hidden group-hover:flex items-center justify-center font-semibold text-white bg-black/70 transition-all duration-300">See
+                        Project</a>
+                </div>
+                <div
+                    class="group relative lg:h-full overflow-hidden rounded-2xl shadow-xl hover:scale-105 transition-all duration-500">
+                    <img class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-40"
+                        src="/src/assets/2.png" alt="Portfolio image">
+                    <a href="#"
+                        class="absolute inset-0 hidden group-hover:flex items-center justify-center font-semibold text-white bg-black/70 transition-all duration-300">See
+                        Project</a>
+                </div>
+                <div
+                    class="group relative lg:h-full overflow-hidden rounded-2xl shadow-xl hover:scale-105 transition-all duration-500">
+                    <img class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-40"
+                        src="/src/assets/3.png" alt="Portfolio image">
+                    <a href="#"
+                        class="absolute inset-0 hidden group-hover:flex items-center justify-center font-semibold text-white bg-black/70 transition-all duration-300">See
+                        Project</a>
+                </div>
+                <div
+                    class="group relative lg:h-full overflow-hidden rounded-2xl shadow-xl hover:scale-105 transition-all duration-500">
+                    <img class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-40"
+                        src="/src/assets/4.png" alt="Portfolio image">
+                    <a href="#"
+                        class="absolute inset-0 hidden group-hover:flex items-center justify-center font-semibold text-white bg-black/70 transition-all duration-300">See
+                        Project</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div data-aos="fade-left"
+            class="flex flex-col gap-y-4 bg-zinc-900 p-3.5 rounded-2xl mx-6 mb-8 md:col-span-12 lg:mp-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-white">About</h3>
+                <a href="#" class="text-xl text-gray-300 hover:text-white transition-all duration-300">Resume</a>
+            </div>
+            <p class="text-gray-400">I am a passionate frontend developer with a strong focus on creating interactive
+                and visually appealing web experiences. I specialize in building responsive and user-friendly interfaces
+                using the latest technologies like HTML, CSS, JavaScript, and React. My goal is to bring ideas to life
+                through design and functionality, while ensuring an optimal experience across all devices. With a keen
+                eye for detail and a commitment to quality, I strive to deliver clean, efficient, and scalable code in
+                every project.</p>
+        </div>
+
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="close-btn" onclick="closeLightbox()">&times;</span>
+        <img id="lightbox-img" src="" alt="Lightbox Image">
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+        });
+
+        // Open lightbox
+        function openLightbox(img) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = img.src;
+            lightbox.classList.add('active');
+        }
+
+        // Close lightbox
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+        }
+        const logoutButton = document.getElementById('logout');
+        logoutButton.addEventListener('click', () => {
+            // Xóa thông tin đăng nhập (nếu có lưu trong localStorage hoặc sessionStorage)
+            localStorage.removeItem('user');
+            sessionStorage.removeItem('user');
+
+            // Chuyển hướng về trang đăng nhập
+            window.location.href = '/login.html';
+        });
+    </script>
+</body>
+
+</html>

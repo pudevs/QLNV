@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="build/tailwind.css">
+  <link rel="stylesheet" href="2-index.css">
+  <title>Danh sách | PuBaDa</title>
+</head>
+
+<body>
+  <div class="left-section collapsed" id="leftSection">
+    <div class="menu">
+      <button class="menu-toggle" id="menuToggle" aria-label="open menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+      <a href="#">PuDevs</a>
+    </div>
+    <div class="sidebar">
+      <a href="1-danhsach.html" class="item" data-section="dashboard">
+        <i class="ri-dashboard-line"></i>
+        <h3>Danh sách</h3>
+      </a>
+      <a href="1-nhanvien.html" class="item" data-section="employees">
+        <i class="ri-user-3-line"></i>
+        <h3>Nhân viên</h3>
+      </a>
+      <a href="1-phongban.html" class="item" data-section="departments">
+        <i class="ri-building-line"></i>
+        <h3>Phòng ban</h3>
+      </a>
+      <a href="1-chucvu.html" class="item active" data-section="positions">
+        <i class="ri-briefcase-4-line"></i>
+        <h3>Chức vụ</h3>
+      </a>
+      <a href="1-luong.html" class="item" data-section="salaries">
+        <i class="ri-money-dollar-circle-line"></i>
+        <h3>Lương</h3>
+      </a>
+      <a href="1-setting.html" class="item" data-section="settings">
+        <i class="ri-settings-3-line"></i>
+        <h3>Cài đặt</h3>
+      </a>
+    </div>
+    <div id="logout" class="sign-out">
+      <i class="ri-logout-box-r-line"></i>
+      <h3>Đăng xuất</h3>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- ...search, logo -->
+    <div class="header">
+      <div class="search">
+        <input type="text" id="searchInput" placeholder="Tìm kiếm chức vụ...">
+        <button id="searchBtn"><i class="ri-search-2-line"></i></button>
+      </div>
+      <img src="assets/profile.png">
+    </div>
+
+    <!-- Chức vụ Section -->
+    
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
+</html>

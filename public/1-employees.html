@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách nhân viên</title>
+    <link href="build/tailwind.css" rel="stylesheet">
+</head>
+
+<body class="p-8 bg-gray-100">
+    <h1 class="text-2xl font-bold mb-4">Danh sách nhân viên</h1>
+    <table class="w-full table-auto border-collapse border border-gray-300">
+        <thead class="bg-gray-200">
+            <tr>
+                <th class="border p-2">ID</th>
+                <th class="border p-2">Tên</th>
+                <th class="border p-2">SĐT</th>
+                <th class="border p-2">Email</th>
+                <th class="border p-2">Địa chỉ</th>
+                <th class="border p-2">Trạng thái</th>
+                <th class="border p-2">Phòng ban</th>
+                <th class="border p-2">Chức vụ</th>
+            </tr>
+        </thead>
+        <tbody id="employeeTableBody"></tbody>
+    </table>
+
+    <script>
+        fetch('/api/employees')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('employeeTableBody');
+                data.forEach(emp => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="border p-2">${emp.nhanvienId}</td>
+                        <td class="border p-2">${emp.tenNV}</td>
+                        <td class="border p-2">${emp.sdtNV}</td>
+                        <td class="border p-2">${emp.emailNV}</td>
+                        <td class="border p-2">${emp.diachiNV}</td>
+                        <td class="border p-2">${emp.trangthaiNV ? 'Đang làm' : 'Nghỉ'}</td>
+                        <td class="border p-2">${emp.tenPb || ''}</td>
+                        <td class="border p-2">${emp.tenCV || ''}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                console.error('Lỗi fetch API:', err);
+            });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+{
+  "sqltools.connections": [
+    
+    {
+      "connectionTimeout": 15,
+      "mssqlOptions": {
+        "appName": "SQLTools",
+        "useUTC": true,
+        "encrypt": true,
+        "trustServerCertificate": true
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 1433,
+      "askForPassword": false,
+      "password": "123456",
+      "authenticationType": "SqlLogin",
+      "driver": "MSSQL",
+      "database": "QLNV",
+      "username": "pubada",
+      "name": "local_QLNV",
+      "group": "Development"
+    }
+  ]
+}
