@@ -40,9 +40,9 @@ CONSTRAINT [FK_nhanvien_chucvu] FOREIGN KEY ([chucvuId]) REFERENCES [dbo].chucvu
 CREATE TABLE [dbo].[luong] (
 [luongId] INT IDENTITY (1, 1) NOT NULL,
 [nhanvienId] INT NOT NULL,
-[Luongcoban] DECIMAL (18, 2) NOT NULL,
-[Phucap] DECIMAL (18, 2) NULL,
-[Thuong] DECIMAL (18, 2) NULL,
+[Luongcoban] DECIMAL (18, 3) NOT NULL,
+[Phucap] DECIMAL (18, 3) NULL,
+[Thuong] DECIMAL (18, 3) NULL,
 CONSTRAINT [PK_luong] PRIMARY KEY CLUSTERED ([luongId] ASC),
 CONSTRAINT [FK_luong_nhanvien] FOREIGN KEY ([nhanvienId]) REFERENCES [dbo].nhanvien
 );

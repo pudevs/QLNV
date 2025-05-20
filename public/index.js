@@ -1,3 +1,18 @@
+// ===== KIỂM TRA ĐĂNG NHẬP (trừ trang login, signup) =====
+const publicPages = ['1-login.html', '1-signup.html'];
+const currentPage = window.location.pathname.split('/').pop();
+if (!publicPages.includes(currentPage) && !localStorage.getItem('user')) {
+    window.location.href = '1-login.html';
+}
+// Xử lý trường hợp quay lại trang bằng nút Back (cache)
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        if (!localStorage.getItem('user') && !publicPages.includes(currentPage)) {
+            window.location.href = '1-login.html';
+        }
+    }
+});
+
 // ===== ĐĂNG NHẬP/ĐĂNG KÝ/ĐĂNG XUẤT =====
 const container = document.getElementById('container');
 const registerBtn = document.getElementById('register');
@@ -17,6 +32,9 @@ if (loginForm) {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         try {
+            // Xóa sạch thông tin đăng nhập cũ trước khi đăng nhập mới
+            localStorage.removeItem('user');
+            sessionStorage.removeItem('user');
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -25,7 +43,9 @@ if (loginForm) {
             const data = await res.json();
             if (!res.ok) return alert(data.message || 'Đăng nhập thất bại!');
             alert(data.message);
-            window.location.href = data.user.role === 'admin' ? '/1-danhsach.html' : '/portfolio.html';
+            // Lưu trạng thái đăng nhập mới
+            localStorage.setItem('user', JSON.stringify(data.user));
+            window.location.href = data.user.role === 'admin' ? '/1-danhsach.html' : '/1-portfolio.html';
         } catch (error) {
             alert('Đã xảy ra lỗi khi đăng nhập.');
         }
@@ -53,21 +73,35 @@ if (signUpForm) {
 const logoutBtn = document.getElementById('logout');
 if (logoutBtn) {
     logoutBtn.onclick = function () {
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
         window.location.href = '1-login.html';
     };
 }
 
 // ===== HÀM CHUNG =====
 const isValidId = id => id && id !== 'undefined' && !isNaN(Number(id));
+
+// Hàm showForm tối ưu: tự động điền lại dữ liệu cho input/select khi sửa
 function showForm(table, form, edit = false, data = {}, idField = 'data-edit-id') {
     if (!table || !form) return;
     table.style.display = edit ? 'none' : '';
     form.style.display = edit ? 'block' : 'none';
-    form.reset();
+    if (!edit) form.reset(); // chỉ reset khi thêm mới
     if (edit && data && data.id !== undefined) {
         form.setAttribute(idField, data.id);
         Object.keys(data).forEach(k => {
-            if (form[k] !== undefined) form[k].value = data[k] || '';
+            // Ưu tiên theo name, nếu không có thì theo id
+            const field = form.querySelector(`[name="${k}"], [id="${k}"]`);
+            if (field) {
+                if (field.tagName === 'SELECT') {
+                    field.value = String(data[k]);
+                } else if (field.type === 'radio' || field.type === 'checkbox') {
+                    field.checked = !!data[k];
+                } else {
+                    field.value = data[k] || '';
+                }
+            }
         });
     } else {
         form.removeAttribute(idField);
@@ -95,30 +129,6 @@ if (menuToggle && leftSection) {
         leftSection.classList.toggle('collapsed');
     };
 }
-
-/*
-// --- Lưu trạng thái sidebar vào localStorage ---
-const sidebar = document.getElementById('leftSection');
-// Khi bấm nút toggle
-if (menuToggle && sidebar) {
-    menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        // Lưu trạng thái vào localStorage
-        localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
-    });
-}
-
-// Khi load lại trang, đọc trạng thái
-window.addEventListener('DOMContentLoaded', () => {
-    if (sidebar) {
-        const collapsed = localStorage.getItem('sidebar-collapsed');
-        if (collapsed === '1') {
-            sidebar.classList.add('collapsed');
-        } else {
-            sidebar.classList.remove('collapsed');
-        }
-    }
-}); */
 
 // ===== DASHBOARD: DANH SÁCH NHÂN VIÊN (CHỈ XEM) =====
 async function loadDashboardEmployees() {
@@ -148,7 +158,7 @@ loadDashboardEmployees();
 
 // ===== HÀM LOAD PHÒNG BAN & CHỨC VỤ VÀO SELECT =====
 async function loadPhongbanSelect() {
-    const select = document.getElementById('phongbanSelect');   
+    const select = document.getElementById('phongbanSelect');
     if (!select) return;
     const res = await fetch('/api/departments');
     if (!res.ok) return;
@@ -176,12 +186,25 @@ const employeeTable = document.getElementById('employeeTable');
 const addEmployeeForm = document.getElementById('addEmployeeForm');
 const employeeForm = document.getElementById('employeeForm');
 
-// Khi bấm nút Thêm nhân viên, luôn load lại danh sách phòng ban và chức vụ mới nhất
-if (addBtn) addBtn.onclick = async () => {
+async function showEmployeeForm(edit = false, nv = {}) {
     await loadPhongbanSelect();
     await loadChucvuSelect();
-    showForm(employeeTable, addEmployeeForm, true);
-};
+    showForm(employeeTable, addEmployeeForm, edit, {
+        id: nv.nhanvienId,
+        tenNV: nv.tenNV,
+        emailNV: nv.emailNV,
+        sdtNV: nv.sdtNV,
+        diachiNV: nv.diachiNV,
+        phongbanId: nv.phongbanId,
+        chucvuId: nv.chucvuId,
+        trangthaiNV: nv.trangthaiNV ? '1' : '0'
+    });
+    if (edit && nv.nhanvienId !== undefined) {
+        employeeForm.setAttribute('data-edit-id', nv.nhanvienId);
+    } else {
+        employeeForm.removeAttribute('data-edit-id');
+    }
+}
 
 async function loadEmployees() {
     const tbody = document.getElementById('employeeList');
@@ -211,21 +234,11 @@ async function loadEmployees() {
 
         // Sửa nhân viên
         tbody.querySelectorAll('.edit').forEach(btn => {
-            btn.onclick = function () {
+            btn.onclick = async function () {
                 const id = this.getAttribute('data-id');
                 const nv = data.find(n => String(n.nhanvienId) === String(id));
                 if (!nv) return;
-                showForm(employeeTable, addEmployeeForm, true, {
-                    id,
-                    tenNV: nv.tenNV,
-                    emailNV: nv.emailNV,
-                    sdtNV: nv.sdtNV,
-                    diachiNV: nv.diachiNV,
-                    phongbanId: nv.phongbanId,
-                    chucvuId: nv.chucvuId,
-                    trangthaiNV: nv.trangthaiNV ? '1' : '0'
-                });
-                employeeForm.setAttribute('data-edit-id', id);
+                await showEmployeeForm(true, nv);
             };
         });
 
@@ -251,8 +264,24 @@ async function loadEmployees() {
     }
 }
 loadEmployees();
+const searchEmployeeId = document.getElementById('searchEmployeeId');
+if (searchEmployeeId) {
+    searchEmployeeId.addEventListener('input', function () {
+        const searchValue = this.value.trim();
+        const rows = document.querySelectorAll('#employeeList tr');
+        rows.forEach(row => {
+            const idCell = row.querySelector('td:nth-child(1)');
+            if (!searchValue || (idCell && idCell.textContent.includes(searchValue))) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+}
 
-if (addBtn) addBtn.onclick = () => showForm(employeeTable, addEmployeeForm, true);
+
+if (addBtn) addBtn.onclick = () => showEmployeeForm(true);
 if (cancelBtn) cancelBtn.onclick = () => showForm(employeeTable, addEmployeeForm, false);
 
 if (employeeForm) {
@@ -362,6 +391,21 @@ async function loadDepartments() {
     }
 }
 loadDepartments();
+const searchDepartmentId = document.getElementById('searchDepartmentId');
+if (searchDepartmentId) {
+    searchDepartmentId.addEventListener('input', function () {
+        const searchValue = this.value.trim();
+        const rows = document.querySelectorAll('#departmentList tr');
+        rows.forEach(row => {
+            const idCell = row.querySelector('td:nth-child(1)');
+            if (!searchValue || (idCell && idCell.textContent.includes(searchValue))) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+}
 
 if (addDepartmentBtn) addDepartmentBtn.onclick = () => showDepartmentForm(true);
 if (cancelDepartment) cancelDepartment.onclick = () => showDepartmentForm(false);
@@ -469,6 +513,21 @@ async function loadPositions() {
     }
 }
 loadPositions();
+const searchPositionId = document.getElementById('searchPositionId');
+if (searchPositionId) {
+    searchPositionId.addEventListener('input', function () {
+        const searchValue = this.value.trim();
+        const rows = document.querySelectorAll('#positionList tr');
+        rows.forEach(row => {
+            const idCell = row.querySelector('td:nth-child(1)');
+            if (!searchValue || (idCell && idCell.textContent.includes(searchValue))) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+}
 
 if (addPositionBtn) addPositionBtn.onclick = () => showPositionForm(true);
 if (cancelPosition) cancelPosition.onclick = () => showPositionForm(false);
@@ -503,10 +562,150 @@ if (positionForm) {
     };
 }
 
+// ===== LƯƠNG: HIỂN THỊ, THÊM, SỬA, XOÁ =====
+const salaryTable = document.getElementById('salaryTable');
+const salaryList = document.getElementById('salaryList');
+const addSalaryBtn = document.getElementById('addSalaryBtn');
+const addSalaryForm = document.getElementById('addSalaryForm');
+const salaryForm = document.getElementById('salaryForm');
+const cancelSalary = document.getElementById('cancelSalary');
+const salaryNhanvienId = document.getElementById('salaryNhanvienId');
+
+// Load danh sách nhân viên vào select
+async function loadSalaryNhanvienSelect() {
+    if (!salaryNhanvienId) return;
+    const res = await fetch('/api/employees');
+    if (!res.ok) return;
+    const data = await res.json();
+    salaryNhanvienId.innerHTML = data.map(nv =>
+        `<option value="${nv.nhanvienId}">${nv.tenNV}</option>`
+    ).join('');
+}
+
+function showSalaryForm(edit = false, luong = {}) {
+    loadSalaryNhanvienSelect().then(() => {
+        showForm(salaryTable, addSalaryForm, edit, {
+            id: luong.luongId,
+            nhanvienId: luong.nhanvienId,
+            Luongcoban: luong.Luongcoban,
+            Phucap: luong.Phucap,
+            Thuong: luong.Thuong
+        });
+        if (edit && luong.luongId !== undefined) {
+            salaryForm.setAttribute('data-edit-id', luong.luongId);
+        } else {
+            salaryForm.removeAttribute('data-edit-id');
+        }
+    });
+}
+
+async function loadSalaries() {
+    if (!salaryList) return;
+    try {
+        const res = await fetch('/api/salaries');
+        if (!res.ok) return;
+        const data = await res.json();
+        salaryList.innerHTML = data.map((luong, idx) => `
+            <tr>
+                <td>${idx + 1}</td>
+                <td>${luong.tenNV || ''}</td>
+                <td>${luong.Luongcoban}</td>
+                <td>${luong.Phucap}</td>
+                <td>${luong.Thuong}</td>
+                <td>
+                  <button class="action-btn edit" data-id="${luong.luongId ?? ''}">Sửa</button>
+                  <button class="action-btn delete" data-id="${luong.luongId ?? ''}">Xoá</button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Sửa lương
+        salaryList.querySelectorAll('.edit').forEach(btn => {
+            btn.onclick = function () {
+                const id = this.getAttribute('data-id');
+                const luong = data.find(l => String(l.luongId) === String(id));
+                if (!luong) return alert('Không tìm thấy bản ghi lương!');
+                showSalaryForm(true, luong);
+            };
+        });
+
+        // Xoá lương
+        salaryList.querySelectorAll('.delete').forEach(btn => {
+            btn.onclick = async function () {
+                const id = this.getAttribute('data-id');
+                if (!isValidId(id)) return alert('Không tìm thấy ID lương!');
+                if (confirm('Bạn có chắc muốn xoá bản ghi lương này?')) {
+                    const res = await fetch('/api/salaries/' + id, { method: 'DELETE' });
+                    const result = await res.json();
+                    if (res.ok) {
+                        alert('Xoá thành công!');
+                        loadSalaries();
+                    } else {
+                        alert(result.message || 'Có lỗi xảy ra khi xoá!');
+                    }
+                }
+            };
+        });
+    } catch (e) {
+        console.error(e);
+    }
+}
+loadSalaries();
+
+const searchSalaryId = document.getElementById('searchSalaryId');
+if (searchSalaryId) {
+    searchSalaryId.addEventListener('input', function () {
+        const searchValue = this.value.trim();
+        const rows = document.querySelectorAll('#salaryList tr');
+        rows.forEach(row => {
+            const idCell = row.querySelector('td:nth-child(1)');
+            if (!searchValue || (idCell && idCell.textContent.includes(searchValue))) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+}
+
+if (addSalaryBtn) addSalaryBtn.onclick = () => showSalaryForm(true);
+if (cancelSalary) cancelSalary.onclick = () => showSalaryForm(false);
+
+if (salaryForm) {
+    salaryForm.onsubmit = async function (e) {
+        e.preventDefault();
+        const nhanvienId = salaryForm.nhanvienId.value;
+        const Luongcoban = salaryForm.Luongcoban.value;
+        const Phucap = salaryForm.Phucap.value;
+        const Thuong = salaryForm.Thuong.value;
+        const editId = salaryForm.getAttribute('data-edit-id');
+        let url = '/api/salaries';
+        let method = 'POST';
+        let body = { nhanvienId, Luongcoban, Phucap, Thuong };
+        if (isValidId(editId)) {
+            url += '/' + editId;
+            method = 'PUT';
+        }
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const result = await res.json();
+        if (res.ok) {
+            alert(editId ? 'Cập nhật lương thành công!' : 'Thêm lương thành công!');
+            showSalaryForm(false);
+            loadSalaries();
+        } else {
+            alert(result.message || 'Có lỗi xảy ra!');
+        }
+    };
+}
+
 // ===== Reset all SQL ======
 document.getElementById('resetAllBtn').onclick = async function () {
     const password = prompt('Nhập mật khẩu quản trị để xác nhận xoá toàn bộ dữ liệu:');
-    if (password !== 'Pubada123@') { // Thay 'matkhaucuaban' bằng mật khẩu thật của bạn
+    if (password !== 'Pubada123@') {
         alert('Mật khẩu không đúng!');
         return;
     }
@@ -516,5 +715,13 @@ document.getElementById('resetAllBtn').onclick = async function () {
         alert(result.message);
         loadDepartments && loadDepartments();
         loadEmployees && loadEmployees();
+        loadPositions && loadPositions();
     }
+};
+
+const nhanvienSelect = document.getElementById('salaryNhanvienId');
+nhanvienSelect.onchange = function() {
+    const tenNV = this.options[this.selectedIndex].text;
+    // Hiển thị tên nhân viên ở đâu đó
+    document.getElementById('tenNhanVienHienThi').textContent = tenNV;
 };

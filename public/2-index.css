@@ -322,7 +322,8 @@ body {
 ========================= */
 #addEmployeeForm,
 #addDepartmentForm,
-#addPositionForm {
+#addPositionForm,
+#addSalaryForm {
     background: #fff;
     border: 1px solid #eee;
     padding: 24px;
@@ -334,7 +335,8 @@ body {
 
 #addEmployeeForm h3,
 #addDepartmentForm h3,
-#addPositionForm h3 {
+#addPositionForm h3,
+#addSalaryForm h3 {
     margin-bottom: 18px;
     font-size: 20px;
     font-weight: 600;
@@ -344,7 +346,8 @@ body {
 
 #addEmployeeForm label,
 #addDepartmentForm label,
-#addPositionForm label {
+#addPositionForm label,
+#addSalaryForm label {
     display: inline-block;
     width: 120px;
     font-weight: 500;
@@ -355,7 +358,9 @@ body {
 #addEmployeeForm input,
 #addDepartmentForm input,
 #addPositionForm input[type="text"],
-#addEmployeeForm select {
+#addSalaryForm input,
+#addEmployeeForm select,
+#addSalaryForm select {
     width: 100%;
     padding: 6px 10px;
     margin-bottom: 12px;
@@ -370,20 +375,24 @@ body {
 #addEmployeeForm input:focus,
 #addDepartmentForm input:focus,
 #addPositionForm input[type="text"]:focus,
-#addEmployeeForm select:focus {
+#addSalaryForm input:focus,
+#addEmployeeForm select:focus,
+#addSalaryForm select:focus {
     border-color: #3498db;
     outline: none;
 }
 
 #addEmployeeForm form>div,
 #addDepartmentForm form>div,
-#addPositionForm form>div {
+#addPositionForm form>div,
+#addSalaryForm form>div {
     margin-bottom: 12px;
 }
 
 #addEmployeeForm .add-btn,
 #addDepartmentForm .add-btn,
-#addPositionForm .add-btn {
+#addPositionForm .add-btn,
+#addSalaryForm .add-btn {
     min-width: 90px;
     margin-right: 8px;
     padding: 8px 0;
@@ -398,19 +407,22 @@ body {
 
 #addEmployeeForm .add-btn:hover,
 #addDepartmentForm .add-btn:hover,
-#addPositionForm .add-btn:hover {
+#addPositionForm .add-btn:hover,
+#addSalaryForm .add-btn:hover {
     background: #217dbb;
 }
 
 #addEmployeeForm #cancelAdd,
 #addDepartmentForm #cancelDepartment,
-#addPositionForm #cancelPosition {
+#addPositionForm #cancelPosition,
+#addSalaryForm #cancelSalary {
     background: #e74c3c;
 }
 
 #addEmployeeForm #cancelAdd:hover,
 #addDepartmentForm #cancelDepartment:hover,
-#addPositionForm #cancelPosition:hover {
+#addPositionForm #cancelPosition:hover,
+#addSalaryForm #cancelSalary:hover {
     background: #c0392b;
 }
 

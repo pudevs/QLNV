@@ -69,21 +69,21 @@ app.post('/api/signup', async (req, res) => {
 
 // API xoá toàn bộ dữ liệu và reset IDENTITY
 app.delete('/api/reset-all', async (req, res) => {
-  try {
-    await sql.connect(config);
-    // Xoá dữ liệu bảng con trước (luong, nhanvien), sau đó bảng cha (phongban)
-    await sql.query`DELETE FROM luong`;
-    await sql.query`DELETE FROM nhanvien`;
-    await sql.query`DELETE FROM phongban`;
-    // Reset lại IDENTITY về 0
-    await sql.query`DBCC CHECKIDENT ('luong', RESEED, 0)`;
-    await sql.query`DBCC CHECKIDENT ('nhanvien', RESEED, 0)`;
-    await sql.query`DBCC CHECKIDENT ('phongban', RESEED, 0)`;
-    res.json({ message: 'Đã xoá toàn bộ dữ liệu và reset IDENTITY!' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Lỗi khi reset dữ liệu.', error: err.message });
-  }
+    try {
+        await sql.connect(config);
+        await sql.query`DELETE FROM luong`;
+        await sql.query`DELETE FROM nhanvien`;
+        await sql.query`DELETE FROM chucvu`;
+        await sql.query`DELETE FROM phongban`;
+        // Reset identity
+        await sql.query`DBCC CHECKIDENT ('luong', RESEED, 0)`;
+        await sql.query`DBCC CHECKIDENT ('nhanvien', RESEED, 0)`;
+        await sql.query`DBCC CHECKIDENT ('chucvu', RESEED, 0)`;
+        await sql.query`DBCC CHECKIDENT ('phongban', RESEED, 0)`;
+        res.json({ message: 'Đã xoá toàn bộ dữ liệu và reset ID!' });
+    } catch (err) {
+        res.status(500).json({ message: 'Lỗi khi reset dữ liệu.', error: err.message });
+    }
 });
 
 // Lấy danh sách nhân viên
@@ -310,4 +310,74 @@ app.delete('/api/positions/:id', async (req, res) => {
 const port = 3000;
 app.listen(port, () => {
   console.log(`Server chạy ở http://localhost:${port}`);
+});
+
+// ===== LƯƠNG: HIỂN THỊ, THÊM, SỬA, XOÁ =====
+
+// Lấy danh sách lương
+app.get('/api/salaries', async (req, res) => {
+  try {
+    await sql.connect(config);
+    const result = await sql.query(`
+      SELECT l.luongId, l.nhanvienId, l.Luongcoban, l.Phucap, l.Thuong, nv.tenNV
+      FROM luong l
+      LEFT JOIN nhanvien nv ON l.nhanvienId = nv.nhanvienId
+    `);
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi lấy lương.', error: err.message });
+  }
+});
+
+// Thêm lương
+app.post('/api/salaries', async (req, res) => {
+  const { nhanvienId, Luongcoban, Phucap, Thuong } = req.body;
+  if (!nhanvienId || !Luongcoban) {
+    return res.status(400).json({ message: 'Thiếu thông tin lương!' });
+  }
+  try {
+    await sql.connect(config);
+    await sql.query`
+      INSERT INTO luong (nhanvienId, Luongcoban, Phucap, Thuong)
+      VALUES (${nhanvienId}, ${Luongcoban}, ${Phucap || 0}, ${Thuong || 0})
+    `;
+    res.status(201).json({ message: 'Thêm lương thành công!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi thêm lương.', error: err.message });
+  }
+});
+// Sửa lương
+app.put('/api/salaries/:id', async (req, res) => {
+  const { id } = req.params;
+  const { nhanvienId, Luongcoban, Phucap, Thuong } = req.body;
+  if (!nhanvienId || !Luongcoban) {
+    return res.status(400).json({ message: 'Thiếu thông tin lương!' });
+  }
+  try {
+    await sql.connect(config);
+    await sql.query`
+      UPDATE luong
+      SET nhanvienId = ${nhanvienId}, Luongcoban = ${Luongcoban}, Phucap = ${Phucap || 0}, Thuong = ${Thuong || 0}
+      WHERE luongId = ${id}
+    `;
+    res.json({ message: 'Cập nhật lương thành công!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi cập nhật lương.', error: err.message });
+  }
+});
+
+// Xoá lương
+app.delete('/api/salaries/:id', async (req, res) => {
+  let id = req.params.id;
+  id = Number(id);
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ message: 'ID lương không hợp lệ!' });
+  }
+  try {
+    await sql.connect(config);
+    await sql.query`DELETE FROM luong WHERE luongId = ${id}`;
+    res.json({ message: 'Xoá lương thành công!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi xoá lương.', error: err.message });
+  }
 });
