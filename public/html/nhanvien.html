@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="build/tailwind.css">
-    <link rel="stylesheet" href="2-index.css">
+    <link rel="stylesheet" href="../build/tailwind.css">
+    <link rel="stylesheet" href="../css/index.css">
     <title>Nhân Viên | PuBaDa</title>
 </head>
 
@@ -22,27 +22,27 @@
             <a href="#">PuDevs</a>
         </div>
         <div class="sidebar">
-            <a href="1-danhsach.html" class="item" data-section="dashboard">
+            <a href="danhsach.html" class="item" data-section="dashboard">
                 <i class="ri-dashboard-line"></i>
                 <h3>Danh sách</h3>
             </a>
-            <a href="1-nhanvien.html" class="item active" data-section="employees">
+            <a href="nhanvien.html" class="item active" data-section="employees">
                 <i class="ri-user-3-line"></i>
                 <h3>Nhân viên</h3>
             </a>
-            <a href="1-phongban.html" class="item" data-section="departments">
+            <a href="phongban.html" class="item" data-section="departments">
                 <i class="ri-building-line"></i>
                 <h3>Phòng ban</h3>
             </a>
-            <a href="1-chucvu.html" class="item" data-section="positions">
+            <a href="chucvu.html" class="item" data-section="positions">
                 <i class="ri-briefcase-4-line"></i>
                 <h3>Chức vụ</h3>
             </a>
-            <a href="1-luong.html" class="item" data-section="salaries">
+            <a href="luong.html" class="item" data-section="salaries">
                 <i class="ri-money-dollar-circle-line"></i>
                 <h3>Lương</h3>
             </a>
-            <a href="1-setting.html" class="item" data-section="settings">
+            <a href="setting.html" class="item" data-section="settings">
                 <i class="ri-settings-3-line"></i>
                 <h3>Cài đặt</h3>
             </a>
@@ -60,14 +60,14 @@
                 <input type="text" id="searchEmployeeId" placeholder="Tìm kiếm mã nhân viên...">
                 <button id="searchBtn"><i class="ri-search-2-line"></i></button>
             </div>
-            <img src="assets/profile.png">
+            <img src="../assets/profile.png" alt="Logo">
         </div>
 
         <!-- Employees Section -->
         <div class="content" id="employees-section">
             <div class="section-header">
                 <h3>Danh sách nhân viên</h3>
-                <button id="addEmployeeBtn" class="add-btn">+ Thêm nhân viên</button>
+                <button id="addEmployeeBtn" class="add-btn">Thêm nhân viên</button>
             </div>
             <table id="employeeTable">
                 <thead>
@@ -130,7 +130,19 @@
         </div>
     </div>
 
-    <script src="index.js"></script>
+    <script src="../js/login.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/nhanvien.js"></script>
+    <script>
+        (function () {
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme) {
+                document.documentElement.setAttribute('data-theme', currentTheme);
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 </body>
 
 </html>

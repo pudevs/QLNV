@@ -6,9 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-  <link rel="stylesheet" href="build/tailwind.css">
-  <link rel="stylesheet" href="2-index.css">
+  <link rel="stylesheet" href="../build/tailwind.css">
+  <link rel="stylesheet" href="../css/index.css">
   <title>Setting | PuBaDa</title>
+
+  <style>
+    
+  </style>
 </head>
 
 <body>
@@ -22,27 +26,27 @@
       <a href="#">PuDevs</a>
     </div>
     <div class="sidebar">
-      <a href="1-danhsach.html" class="item" data-section="dashboard">
+      <a href="danhsach.html" class="item" data-section="dashboard">
         <i class="ri-dashboard-line"></i>
         <h3>Danh sách</h3>
       </a>
-      <a href="1-nhanvien.html" class="item" data-section="employees">
+      <a href="nhanvien.html" class="item" data-section="employees">
         <i class="ri-user-3-line"></i>
         <h3>Nhân viên</h3>
       </a>
-      <a href="1-phongban.html" class="item" data-section="departments">
+      <a href="phongban.html" class="item" data-section="departments">
         <i class="ri-building-line"></i>
         <h3>Phòng ban</h3>
       </a>
-      <a href="1-chucvu.html" class="item" data-section="positions">
+      <a href="chucvu.html" class="item" data-section="positions">
         <i class="ri-briefcase-4-line"></i>
         <h3>Chức vụ</h3>
       </a>
-      <a href="1-luong.html" class="item" data-section="salaries">
+      <a href="luong.html" class="item" data-section="salaries">
         <i class="ri-money-dollar-circle-line"></i>
         <h3>Lương</h3>
       </a>
-      <a href="1-setting.html" class="item active" data-section="settings">
+      <a href="setting.html" class="item active" data-section="settings">
         <i class="ri-settings-3-line"></i>
         <h3>Cài đặt</h3>
       </a>
@@ -55,11 +59,34 @@
 
   <div class="main">
     <!-- Setting Section -->
-    <!-- Thêm vào vị trí bạn muốn, ví dụ bên cạnh nút Thêm nhân viên -->
     <button id="resetAllBtn" class="action-btn danger">Xoá tất cả dữ liệu</button>
-  </div>
+    <div class="">
+      <div class=""></div>
+    </div>
 
-  <script src="index.js"></script>
+    <h1>Cài đặt Giao diện</h1>
+    <div class="card">
+      <h2>Chế độ màu</h2>
+      <p>Chọn chế độ hiển thị sáng hoặc tối.</p>
+      <button id="themeToggleButton">Chuyển sang Chế độ Tối</button>
+    </div>
+
+  <script src="../js/index.js"></script>
+  <script src="../js/login.js"></script>
+  <script src="../js/settting.js"></script>
+  <script>
+    (function () {
+      const currentTheme = localStorage.getItem('theme');
+      if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+      } else {
+        // Nếu không có theme nào được lưu, có thể đặt mặc định là 'light'
+        // Hoặc dựa vào preference của hệ thống (nếu muốn phức tạp hơn)
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
 </body>
 
 </html>

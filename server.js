@@ -8,13 +8,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static('public')); // Cho phép truy cập file trong public/
+app.use('/build', express.static('build')); // Cho phép truy cập file trong build/
 
 // Config kết nối SQL Server
 const config = {
   user: 'pubada',
   password: '123456',
-  server: 'localhost',
+  server: ' 192.168.137.1,1433',
   database: 'QLNV',
   options: {
     encrypt: true,

@@ -1,6 +1,5 @@
 {
   "sqltools.connections": [
-    
     {
       "connectionTimeout": 15,
       "mssqlOptions": {
@@ -12,7 +11,6 @@
       "previewLimit": 50,
       "server": "localhost",
       "port": 1433,
-      "askForPassword": false,
       "password": "123456",
       "authenticationType": "SqlLogin",
       "driver": "MSSQL",
